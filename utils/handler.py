@@ -1,9 +1,8 @@
 from model.mbr.descriptor import Descriptor
+from model.mbr.qualifier import Qualifier
 
 __author__ = 'swatford'
 
-def handle_descriptor_record(_,desc):
-        d = Descriptor(desc)
-        d.save()
-        print(d.uid)
-        return True
+
+def _container():
+        pass

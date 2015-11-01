@@ -1,4 +1,5 @@
-from mongoengine import connect
+from mongoengine import (connect)
+
 
 __author__ = 'swatford'
 

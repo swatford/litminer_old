@@ -1,4 +1,4 @@
-from model import (Document,IntField,BinaryField,ListField,DictField)
+from litminer.model import (Document,IntField,BinaryField,ListField,DictField)
 
 __author__ = 'swatford'
 

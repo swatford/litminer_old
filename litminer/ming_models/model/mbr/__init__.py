@@ -1,8 +1,7 @@
-from ming_models.model import session
 from ming import schema
 from ming.odm import (MappedClass,FieldProperty)
-from collections import OrderedDict
 from datetime import datetime
+from litminer.ming_models import session
 
 __author__ = 'swatford'
 
@@ -12,8 +11,8 @@ class TermInTree(MappedClass):
     # used for querying tree ex. db.descriptor.find({parents:"A02"})
     parents = FieldProperty(schema.Array(schema.String))
 
-    def __init__(self,record):
-        super(TermInTree,self).__init__()
+    def __init__(self,record,*args,**kwargs):
+        super(TermInTree,self).__init__(*args,**kwargs)
         if record is not None:
             if "TreeNumberList" in record:
                     if isinstance(record["TreeNumberList"]["TreeNumber"],list):
@@ -62,8 +61,8 @@ class MeshTerm(MappedClass):
 
     _type = FieldProperty(schema.String(if_missing="base"))
 
-    def __init__(self,record):
-        super(MeshTerm,self).__init__(record)
+    def __init__(self,record,*args,**kwargs):
+        super(MeshTerm,self).__init__(record,*args,**kwargs)
         if record is not None:
 
             if type(self).__name__ == "Descriptor":

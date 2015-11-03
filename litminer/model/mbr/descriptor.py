@@ -1,7 +1,9 @@
-from mongoengine import (ListField,ReferenceField)
-from model.mbr import MeshTerm
-from model.mbr.qualifier import Qualifier
 from collections import OrderedDict
+
+from mongoengine import (ListField,ReferenceField)
+
+from litminer.model.mbr import MeshTerm
+from litminer.model.mbr import Qualifier
 
 __author__ = "swatford"
 

@@ -1,43 +1,35 @@
 # from utils import MeshImporter
 # from utils import ArticleImporter
-# from gzip import GzipFile
-# import xmltodict as xtd
 # from os import listdir
 import configparser
-from ming import create_datastore
-from ming.odm import ThreadLocalODMSession
-from ming_models.model import create_session
+import xmltodict as xtd
+from gzip import GzipFile
+from litminer.ming_models import session
 
 def main(*args,**kwargs):
 
-    config = configparser.ConfigParser()
-    config.read("dev_config.ini")
-    create_session(config)
-
     # from ming_models.model.mbr.descriptor import Descriptor
-    # from ming_models.model.mbr.qualifier import Qualifier
-    # from ming_models.model.mbr import MeshTerm
-    # from ming_models.model import session
-    #
+    from litminer.ming_models.model.mbr.qualifier import Qualifier
+
     # def handle_d(_,desc):
     #     d = Descriptor(desc)
     #     print(d._id)
     #     return True
-    #
-    # def handle_q(_,qual):
-    #     q = Qualifier(qual)
-    #     print(q._id)
-    #     return True
+    print(Qualifier.__mro__)
+    def handle_q(_,qual):
+        q = Qualifier(qual)
+        print(q._id)
+        return True
 
     # xtd.parse(GzipFile("/media/swatford/elements/medline/mesh/desc2015.xml.gz"),
     #           item_depth=2,item_callback=handle_d)
 
-    # xtd.parse(GzipFile("/media/swatford/elements/medline/mesh/qual2015.xml.gz"),
-    #           item_depth=2,item_callback=handle_q)
-    #
-    # session.flush()
-    # session.clear()
-    # session.close()
+    xtd.parse(GzipFile("F:\\medline\\mesh\\qual2015.xml.gz"),
+              item_depth=2,item_callback=handle_q)
+
+    session.flush()
+    session.clear()
+    session.close()
 
     # MESH_PATH = "/media/swatford/elements/medline/mesh"
 

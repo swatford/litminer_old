@@ -1,6 +1,8 @@
-from mongoengine import (StringField,ListField,DateTimeField)
-from model.mbr import MeshTerm
 from collections import OrderedDict
+
+from mongoengine import (StringField,ListField)
+
+from litminer.model.mbr import MeshTerm
 
 __author__ = 'swatford'
 

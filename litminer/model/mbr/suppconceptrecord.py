@@ -1,8 +1,10 @@
-from mongoengine import (IntField,ListField,GenericReferenceField,StringField)
 from collections import OrderedDict
-from model.mbr import MeshTerm
-from model.mbr.descriptor import Descriptor
-from model.mbr.descriptor import Qualifier
+
+from mongoengine import (IntField,ListField,GenericReferenceField,StringField)
+
+from litminer.model.mbr import MeshTerm
+from litminer.model.mbr import Descriptor
+from litminer.model.mbr import Qualifier
 
 __author__ = 'swatford'
 

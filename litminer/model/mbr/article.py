@@ -1,10 +1,7 @@
-from mongoengine import (Document,EmbeddedDocument,EmbeddedDocumentField,IntField,StringField,DateTimeField,
-                         ListField,GenericReferenceField,BooleanField,EmbeddedDocumentListField)
 from collections import OrderedDict
-from model.mbr.descriptor import Descriptor
-from model.mbr.qualifier import Qualifier
-from model.mbr.suppconceptrecord import SupplementaryConceptRecord
-from model.mbr import MeshTerm
+
+from mongoengine import (Document,EmbeddedDocument, IntField,StringField,DateTimeField,
+                         ListField, BooleanField,EmbeddedDocumentListField)
 
 __author__ = 'swatford'
 

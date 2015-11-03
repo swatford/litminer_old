@@ -1,7 +1,9 @@
-from ming import schema
-from ming_models.model.mbr import MeshTerm
-from ming.odm import (FieldProperty)
 from collections import OrderedDict
+
+from ming import schema
+from ming.odm import (FieldProperty)
+
+from litminer.ming_models.model.mbr import MeshTerm
 
 __author__ = 'swatford'
 

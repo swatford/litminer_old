@@ -1,10 +1,12 @@
-import xmltodict as xtd
 from gzip import GzipFile
-from model.mbr.descriptor import Descriptor
-from model.mbr.qualifier import Qualifier
-from model.mbr.suppconceptrecord import SupplementaryConceptRecord
-from model.mbr.article import Article
 from os import listdir
+
+import xmltodict as xtd
+
+from litminer.model.mbr import Descriptor
+from litminer.model.mbr import Qualifier
+from litminer.model.mbr import SupplementaryConceptRecord
+from litminer.model.mbr import Article
 
 __author__ = 'swatford'
 

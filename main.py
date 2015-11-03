@@ -8,26 +8,26 @@ from litminer.ming_models import session
 
 def main(*args,**kwargs):
 
-    # from ming_models.model.mbr.descriptor import Descriptor
+    from litminer.ming_models.model.mbr.descriptor import Descriptor
     from litminer.ming_models.model.mbr.qualifier import Qualifier
 
     # def handle_d(_,desc):
     #     d = Descriptor(desc)
     #     print(d._id)
     #     return True
-    print(Qualifier.__mro__)
-    def handle_q(_,qual):
-        q = Qualifier(qual)
-        print(q._id)
-        return True
+    #
+    # def handle_q(_,qual):
+    #     q = Qualifier(qual)
+    #     print(q._id)
+    #     return True
 
     # xtd.parse(GzipFile("/media/swatford/elements/medline/mesh/desc2015.xml.gz"),
     #           item_depth=2,item_callback=handle_d)
 
-    xtd.parse(GzipFile("F:\\medline\\mesh\\qual2015.xml.gz"),
-              item_depth=2,item_callback=handle_q)
+    # xtd.parse(GzipFile("F:\\medline\\mesh\\qual2015.xml.gz"),
+    #           item_depth=2,item_callback=handle_q)
 
-    session.flush()
+    # session.flush()
     session.clear()
     session.close()
 

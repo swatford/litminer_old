@@ -1,9 +1,15 @@
 from ming import create_datastore
 from ming.odm import ThreadLocalODMSession
 
-__author__ = 'swatford'
+def create_session(config):
 
-session = ThreadLocalODMSession(
-    bind=create_datastore("mongodb://localhost:27017/litminer")
-)
+    auth = dict(config["mongodb"])
+    uri = auth.pop("uri",None)
+
+    session = ThreadLocalODMSession(
+        bind=create_datastore(uri=uri,authenticate=auth)
+    )
+
+    return session
+
 

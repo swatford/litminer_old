@@ -26,17 +26,11 @@ class MeshTerm(Document):
     # not yet implemented
     record_originators = ListField(DictField())
 
-    tree_numbers = ListField()
-
-    # used for querying tree ex. db.descriptor.find({parents:"A02"})
-    parents = ListField()
-
     meta = {
         "allow_inheritance": True,
         "indexes": [
             "uid",
-            "name",
-            "tree_numbers"
+            "name"
         ]
     }
 
@@ -44,14 +38,16 @@ class MeshTerm(Document):
 
         super(MeshTerm,self).__init__(*args,**kwargs)
         if record is not None:
-            if "DescriptorUI" in record:
+
+            if type(self).__name__ == "Descriptor":
                 self.uid = record["DescriptorUI"]
                 self.name = record["DescriptorName"]["String"]
-            elif "QualifierUI" in record:
+            elif type(self).__name__ == "Qualifier":
                 self.uid = record["QualifierUI"]
                 self.name = record["QualifierName"]["String"]
-            elif "SCR" in record:
-                pass
+            elif type(self).__name__ == "SupplementaryConceptRecord":
+                self.uid = record["SupplementalRecordUI"]
+                self.name = record["SupplementalRecordName"]["String"]
 
             if "ConceptList" in record:
                 if isinstance(record["ConceptList"]["Concept"],list):
@@ -83,20 +79,3 @@ class MeshTerm(Document):
             self.history_note = record["HistoryNote"] if "HistoryNote" in record else None
             self.online_note = record["OnlineNote"] if "OnlineNote" in record else None
             self.public_mesh_note = record["PublicMeSHNote"] if "PublicMeSHNote" in record else None
-
-            if "TreeNumberList" in record:
-                if isinstance(record["TreeNumberList"]["TreeNumber"],list):
-                    self.tree_numbers = record["TreeNumberList"]["TreeNumber"]
-                else:
-                    self.tree_numbers = [record["TreeNumberList"]["TreeNumber"]]
-
-                self.parents = []
-                for tn in self.tree_numbers:
-                    previous_node = None
-                    for node in tn.split("."):
-                        if previous_node is not None:
-                            previous_node = ".".join([previous_node,node])
-                            self.parents.append(previous_node)
-                        else:
-                            self.parents.append(node)
-                            previous_node = node

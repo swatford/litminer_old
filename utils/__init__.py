@@ -2,20 +2,23 @@ import xmltodict as xtd
 from gzip import GzipFile
 from model.mbr.descriptor import Descriptor
 from model.mbr.qualifier import Qualifier
-from model.mbr import MeshTerm
+from model.mbr.suppconceptrecord import SupplementaryConceptRecord
+from model.mbr.article import Article
+from os import listdir
 
 __author__ = 'swatford'
 
 
 class MeshImporter():
     container = []
+    qualifiers = {}
 
     def handle_descriptor_record(self,_,desc):
-        d = Descriptor(desc)
+        d = Descriptor(desc,qualifiers = self.qualifiers)
         # d._created = True
         self.container.append(d)
         if len(self.container)>50:
-            MeshTerm.objects.insert(self.container)
+            Descriptor.objects.insert(self.container)
             self.container = []
         print(d.uid)
         return True
@@ -24,10 +27,16 @@ class MeshImporter():
         q = Qualifier(qualifier)
         # q._created = True
         self.container.append(q)
-        if len(self.container)>50:
-            MeshTerm.objects.insert(self.container)
-            self.container = []
         print(q.uid)
+        return True
+
+    def handle_scr_record(self,_,scr):
+        s = SupplementaryConceptRecord(scr)
+        self.container.append(s)
+        if len(self.container)>50:
+            SupplementaryConceptRecord.objects.insert(self.container)
+            self.container = []
+        print(s.uid)
         return True
 
     def _import_descriptors(self,path):
@@ -39,15 +48,47 @@ class MeshImporter():
         xtd.parse(GzipFile(path),
               item_depth=2,item_callback=self.handle_qualifier_record)
 
-    def _import_scrs(path):
-        pass
+    def _import_scrs(self,path):
+        xtd.parse(GzipFile(path),
+                  item_depth=2,item_callback=self.handle_scr_record)
 
     def __init__(self,root=None,descriptor_fn=None,qualifier_fn=None,scr_fn=None):
-        self._import_descriptors("/".join([root,descriptor_fn])) if descriptor_fn is not None else None
-        MeshTerm.objects.insert(self.container) if len(self.container)>0 else None
-        self.container = []
         self._import_qualifiers("/".join([root,qualifier_fn])) if qualifier_fn is not None else None
-        Qualifier.objects.insert( self.container) if len(self.container)>0 else None
+        if len(self.container)>0:
+            for q in Qualifier.objects.insert( self.container):
+                self.qualifiers[q.uid] = q
         self.container = []
-        self._import_scrs("/".join([root,scr_fn])) if scr_fn is not None else None
 
+        self._import_descriptors("/".join([root,descriptor_fn])) if descriptor_fn is not None else None
+        Descriptor.objects.insert(self.container) if len(self.container)>0 else None
+        self.qualifiers = {}
+        self.container = []
+
+        self._import_scrs("/".join([root,scr_fn])) if scr_fn is not None else None
+        SupplementaryConceptRecord.objects.insert(self.container) if len(self.container)>0 else None
+        self.container = []
+
+class ArticleImporter():
+
+    container = []
+    qualifiers = {}
+
+    def handle_article_record(self,_,article):
+        a = Article(article)
+        self.container.append(a)
+        print(a.pmid)
+        if len(self.container)>50:
+            Article.objects.insert(self.container)
+            self.container = []
+        return True
+
+    def _import_articles(self,path):
+        xtd.parse(GzipFile(path),
+                  item_depth=2,item_callback=self.handle_article_record)
+
+    def __init__(self,root=None):
+        for fn in listdir(root):
+            if fn.split(".")[-1] == "gz":
+                self._import_articles("/".join([root,fn]))
+        Article.objects.insert(self.container) if len(self.container)>0 else None
+        self.container = []

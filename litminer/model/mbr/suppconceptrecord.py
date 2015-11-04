@@ -14,21 +14,12 @@ class SupplementaryConceptRecord(MeshTerm):
     mapped_to_headings = ListField(GenericReferenceField())
     sources = ListField()
 
-    # only name. does not correspond to uid
-    previous_indexings = ListField()
-
     def __init__(self,record: OrderedDict = None,*args,**kwargs):
         super(SupplementaryConceptRecord,self).__init__(record,*args,**kwargs)
 
         if record is not None:
             self.frequency = record["Frequency"] if "Frequency" in record else None
             self.note = record["Note"] if "Note" in record else None
-
-            if "PreviousIndexingList" in record:
-                if isinstance(record["PreviousIndexingList"],list):
-                    self.previous_indexings = record["PreviousIndexingList"]["PreviousIndexing"]
-                else:
-                    self.previous_indexings = [record["PreviousIndexingList"]["PreviousIndexing"]]
 
             if "HeadingMappedToList" in record:
                 descriptors = []

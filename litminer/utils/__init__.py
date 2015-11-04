@@ -1,12 +1,12 @@
 from gzip import GzipFile
 from os import listdir
-
+from litminer.ming_models import session
 import xmltodict as xtd
 
-from litminer.model.mbr import Descriptor
-from litminer.model.mbr import Qualifier
-from litminer.model.mbr import SupplementaryConceptRecord
-from litminer.model.mbr import Article
+from litminer.ming_models.model.mbr.descriptor import  Descriptor
+from litminer.ming_models.model.mbr.qualifier import Qualifier
+from litminer.ming_models.model.mbr.supplementaryconceptrecord import SupplementaryConceptRecord
+# from litminer.ming_models.model.mbr import Article
 
 __author__ = 'swatford'
 
@@ -16,29 +16,31 @@ class MeshImporter():
     qualifiers = {}
 
     def handle_descriptor_record(self,_,desc):
-        d = Descriptor(desc,qualifiers = self.qualifiers)
-        # d._created = True
+        # d = Descriptor(desc,qualifiers = self.qualifiers)
+        d = Descriptor(record=desc)
         self.container.append(d)
         if len(self.container)>50:
-            Descriptor.objects.insert(self.container)
+            session.flush()
+            session.clear()
             self.container = []
-        print(d.uid)
+        print(d._id)
         return True
 
     def handle_qualifier_record(self,_,qualifier):
-        q = Qualifier(qualifier)
-        # q._created = True
-        self.container.append(q)
-        print(q.uid)
+        q = Qualifier(record=qualifier)
+        # self.container.append(q)
+        self.qualifiers[q._id] = q
+        print(q._id)
         return True
 
     def handle_scr_record(self,_,scr):
-        s = SupplementaryConceptRecord(scr)
+        s = SupplementaryConceptRecord(record=scr)
         self.container.append(s)
         if len(self.container)>50:
-            SupplementaryConceptRecord.objects.insert(self.container)
+            session.flush()
+            session.clear()
             self.container = []
-        print(s.uid)
+        print(s._id)
         return True
 
     def _import_descriptors(self,path):
@@ -56,41 +58,40 @@ class MeshImporter():
 
     def __init__(self,root=None,descriptor_fn=None,qualifier_fn=None,scr_fn=None):
         self._import_qualifiers("/".join([root,qualifier_fn])) if qualifier_fn is not None else None
-        if len(self.container)>0:
-            for q in Qualifier.objects.insert( self.container):
-                self.qualifiers[q.uid] = q
-        self.container = []
+        session.flush()
+        session.clear()
 
         self._import_descriptors("/".join([root,descriptor_fn])) if descriptor_fn is not None else None
-        Descriptor.objects.insert(self.container) if len(self.container)>0 else None
-        self.qualifiers = {}
+        session.flush()
+        session.clear()
         self.container = []
 
         self._import_scrs("/".join([root,scr_fn])) if scr_fn is not None else None
-        SupplementaryConceptRecord.objects.insert(self.container) if len(self.container)>0 else None
+        session.flush()
+        session.clear()
         self.container = []
 
-class ArticleImporter():
-
-    container = []
-    qualifiers = {}
-
-    def handle_article_record(self,_,article):
-        a = Article(article)
-        self.container.append(a)
-        print(a.pmid)
-        if len(self.container)>50:
-            Article.objects.insert(self.container)
-            self.container = []
-        return True
-
-    def _import_articles(self,path):
-        xtd.parse(GzipFile(path),
-                  item_depth=2,item_callback=self.handle_article_record)
-
-    def __init__(self,root=None):
-        for fn in listdir(root):
-            if fn.split(".")[-1] == "gz":
-                self._import_articles("/".join([root,fn]))
-        Article.objects.insert(self.container) if len(self.container)>0 else None
-        self.container = []
+# class ArticleImporter():
+#
+#     container = []
+#     qualifiers = {}
+#
+#     def handle_article_record(self,_,article):
+#         a = Article(article)
+#         self.container.append(a)
+#         print(a.pmid)
+#         if len(self.container)>50:
+#             Article.objects.insert(self.container)
+#             self.container = []
+#         return True
+#
+#     def _import_articles(self,path):
+#         xtd.parse(GzipFile(path),
+#                   item_depth=2,item_callback=self.handle_article_record)
+#
+#     def __init__(self,root=None):
+#         for fn in listdir(root):
+#             if fn.split(".")[-1] == "gz":
+#                 self._import_articles("/".join([root,fn]))
+#         Article.objects.insert(self.container) if len(self.container)>0 else None
+#         self.container = []

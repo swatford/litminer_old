@@ -1,4 +1,4 @@
-# from utils import MeshImporter
+from litminer.utils import MeshImporter
 # from utils import ArticleImporter
 # from os import listdir
 import configparser
@@ -8,33 +8,15 @@ from litminer.ming_models import session
 
 def main(*args,**kwargs):
 
-    from litminer.ming_models.model.mbr.descriptor import Descriptor
+    # MESH_PATH = "/media/swatford/elements/medline/mesh"
+    MESH_PATH = "F:\\medline\\mesh"
     from litminer.ming_models.model.mbr.qualifier import Qualifier
 
-    # def handle_d(_,desc):
-    #     d = Descriptor(desc)
-    #     print(d._id)
-    #     return True
-    #
-    # def handle_q(_,qual):
-    #     q = Qualifier(qual)
-    #     print(q._id)
-    #     return True
-
-    # xtd.parse(GzipFile("/media/swatford/elements/medline/mesh/desc2015.xml.gz"),
-    #           item_depth=2,item_callback=handle_d)
-
-    # xtd.parse(GzipFile("F:\\medline\\mesh\\qual2015.xml.gz"),
-    #           item_depth=2,item_callback=handle_q)
-
-    # session.flush()
-    session.clear()
-    session.close()
-
-    # MESH_PATH = "/media/swatford/elements/medline/mesh"
-
-    # mi = MeshImporter(MESH_PATH,"desc2015.xml.gz","qual2015.xml.gz","supp2015.xml.gz")
-    # mi = MeshImporter(MESH_PATH,scr_fn="supp2015.xml.gz")
+    print(Qualifier.__mro__)
+    mi = MeshImporter(root=MESH_PATH,qualifier_fn="qual2015.xml.gz",
+                      descriptor_fn="desc2015.xml.gz",
+                      scr_fn="supp2015.xml.gz")
+    # mi = MeshImporter(root=MESH_PATH,scr_fn="supp2015.xml.gz")
 
     # FULL_XML_PATH = "/media/swatford/elements/medline/full_xml"
     # ai = ArticleImporter(FULL_XML_PATH)

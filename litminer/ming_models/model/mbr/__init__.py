@@ -5,13 +5,21 @@ from litminer.ming_models import session
 
 __author__ = 'swatford'
 
-class TermInTree(MappedClass):
-    tree_numbers = FieldProperty(schema.Array(schema.String))
+class TermPreviouslyIndexed():
 
-    # used for querying tree ex. db.descriptor.find({parents:"A02"})
-    parents = FieldProperty(schema.Array(schema.String))
+    def __init__(self,*args,**kwargs):
+        record = kwargs.get("record",None)
+        super(TermPreviouslyIndexed,self).__init__(*args,**kwargs)
+        if record is not None:
+            if "PreviousIndexingList" in record:
+                if isinstance(record["PreviousIndexingList"]["PreviousIndexing"],list):
+                    self.previous_indexings = record["PreviousIndexingList"]["PreviousIndexing"]
+                else:
+                    self.previous_indexings = [record["PreviousIndexingList"]["PreviousIndexing"]]
+class TermInTree():
 
-    def __init__(self,record,*args,**kwargs):
+    def __init__(self,*args,**kwargs):
+        record = kwargs.get("record",None)
         super(TermInTree,self).__init__(*args,**kwargs)
         if record is not None:
             if "TreeNumberList" in record:
@@ -26,10 +34,12 @@ class TermInTree(MappedClass):
                         for node in tn.split("."):
                             if previous_node is not None:
                                 previous_node = ".".join([previous_node,node])
-                                self.parents.append(previous_node)
+                                if previous_node not in self.tree_numbers:
+                                    self.parents.append(previous_node)
                             else:
-                                self.parents.append(node)
-                                previous_node = node
+                                if node not in self.tree_numbers:
+                                    self.parents.append(node)
+                                    previous_node = node
 
 
 class MeshTerm(MappedClass):
@@ -40,8 +50,9 @@ class MeshTerm(MappedClass):
         polymorphic_identity = "base"
 
     _id = FieldProperty(schema.String)
+    uid = FieldProperty(schema.String,index=True)
 
-    name = FieldProperty(schema.String)
+    name = FieldProperty(schema.String,index=True)
     concepts = FieldProperty(schema.Array(schema.Object({
         "cuid": schema.String,
         "preferred": schema.Bool
@@ -61,18 +72,24 @@ class MeshTerm(MappedClass):
 
     _type = FieldProperty(schema.String(if_missing="base"))
 
-    def __init__(self,record,*args,**kwargs):
-        super(MeshTerm,self).__init__(record,*args,**kwargs)
+    def __init__(self,*args,**kwargs):
+
+        record = kwargs.pop("record",None)
+        super(MeshTerm,self).__init__()
+
         if record is not None:
 
             if type(self).__name__ == "Descriptor":
                 self._id = record["DescriptorUI"]
+                self.uid = self._id
                 self.name = record["DescriptorName"]["String"]
             elif type(self).__name__ == "Qualifier":
                 self._id = record["QualifierUI"]
+                self.uid = self._id
                 self.name = record["QualifierName"]["String"]
             elif type(self).__name__ == "SupplementaryConceptRecord":
-                self.uid = record["SupplementalRecordUI"]
+                self._id = record["SupplementalRecordUI"]
+                self.uid = self._id
                 self.name = record["SupplementalRecordName"]["String"]
 
             if "ConceptList" in record:
@@ -92,21 +109,28 @@ class MeshTerm(MappedClass):
                 else:
                     self.active_mesh_years = [record["ActiveMeSHYearList"]["Year"]]
 
-            self.date_created = datetime.strptime(" ".join([record["DateCreated"]["Year"],
-                                          record["DateCreated"]["Month"],
-                                          record["DateCreated"]["Day"]]),
-                                                  "%Y %m %d") if "DateCreated" in record else None
+            if "DateCreated" in record:
+                self.date_created = datetime.strptime(" ".join([record["DateCreated"]["Year"],
+                                              record["DateCreated"]["Month"],
+                                              record["DateCreated"]["Day"]]),
+                                                      "%Y %m %d")
+            if "DateEstablished" in record:
+                self.date_establisted = datetime.strptime(" ".join([record["DateEstablished"]["Year"],
+                                                  record["DateEstablished"]["Month"],
+                                                  record["DateEstablished"]["Day"]]),
+                                                          "%Y %m %d")
 
-            self.date_establisted = datetime.strptime(" ".join([record["DateEstablished"]["Year"],
-                                              record["DateEstablished"]["Month"],
-                                              record["DateEstablished"]["Day"]]),
-                                                      "%Y %m %d") if "DateEstablished" in record else None
+            if "DateRevised" in record:
+                self.date_revised = datetime.strptime(" ".join([record["DateRevised"]["Year"],
+                                                                record["DateRevised"]["Month"],
+                                                                record["DateRevised"]["Day"]]),
+                                                                "%Y %m %d")
 
-            self.date_revised = datetime.strptime(" ".join([record["DateRevised"]["Year"],
-                                          record["DateRevised"]["Month"],
-                                          record["DateRevised"]["Day"]]),
-                                                  "%Y %m %d") if "DateRevised" in record else None
+            if "HistoryNote" in record:
+                self.history_note = record["HistoryNote"]
 
-            self.history_note = record["HistoryNote"] if "HistoryNote" in record else None
-            self.online_note = record["OnlineNote"] if "OnlineNote" in record else None
-            self.public_mesh_note = record["PublicMeSHNote"] if "PublicMeSHNote" in record else None
+            if "OnlineNote" in record:
+                self.online_note = record["OnlineNote"]
+
+            if "PublicMeSHNote" in record:
+                self.public_mesh_note = record["PublicMeSHNote"]

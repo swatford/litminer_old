@@ -5,19 +5,10 @@ from mongoengine import (Document,EmbeddedDocument, IntField,StringField,DateTim
 
 __author__ = 'swatford'
 
-class MeshTag(EmbeddedDocument):
-    descriptor = StringField()
-    descriptor_major_topic = BooleanField()
-    qualifier = StringField()
-    qualifier_major_topic = BooleanField()
-
-    def __init__(self,*args,**kwargs):
-        super(MeshTag,self).__init__(*args,**kwargs)
-
 class Article(Document):
     pmid = IntField(required=True,primary_key=True)
     version = IntField()
-    mesh_terms = EmbeddedDocumentListField(MeshTag)
+    mesh_terms = EmbeddedDocumentListField()
     date_created = DateTimeField()
     date_completed = DateTimeField()
     date_revised = DateTimeField()
@@ -30,6 +21,7 @@ class Article(Document):
         if record is not None:
             self.pmid = record["PMID"]["#text"]
             self.version = record["PMID"]["@Version"] if "@Version" in record["PMID"] else None
+
             self.date_created = ",".join([record["DateCreated"]["Year"],
                                           record["DateCreated"]["Month"],
                                           record["DateCreated"]["Day"]]) if "DateCreated" in record else None
@@ -87,7 +79,7 @@ class Article(Document):
                 # for term in MeshTerm.objects(uid__in=uids):
                 #     terms[term.uid] = term
                 for term in record["MeshHeadingList"]["MeshHeading"]:
-                    tag = MeshTag()
+                    tag = None
                     if "DescriptorName" in term:
                         tag.descriptor = term["DescriptorName"]["@UI"]
                         tag.descriptor_major_topic = (1,0)[term["DescriptorName"]["@MajorTopicYN"] == "Y"]

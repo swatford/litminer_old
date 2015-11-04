@@ -1,11 +1,11 @@
 from ming import schema
-from ming.odm import (FieldProperty)
+from ming.odm import (FieldProperty,RelationProperty,ForeignIdProperty)
 
 from litminer.ming_models.model.mbr import (MeshTerm,TermInTree)
 
 __author__ = 'swatford'
 
-class Qualifier(MeshTerm,TermInTree):
+class Qualifier(TermInTree,MeshTerm):
     class __mongometa__:
         polymorphic_identity = "q"
 
@@ -13,10 +13,16 @@ class Qualifier(MeshTerm,TermInTree):
 
     tree_nodes_allowed = FieldProperty(schema.Array(schema.String))
 
+    tree_numbers = FieldProperty(schema.Array(schema.String))
+
+    # used for querying tree ex. db.descriptor.find({parents:"A02"})
+    parents = FieldProperty(schema.Array(schema.String),index=True)
+
     _type = FieldProperty(schema.String(if_missing="q"))
 
-    def __init__(self,record,*args,**kwargs):
-        super(Qualifier,self).__init__(record,*args,**kwargs)
+    def __init__(self,*args,**kwargs):
+        record = kwargs.get("record",None)
+        super(Qualifier,self).__init__(*args,**kwargs)
         if record is not None:
             if "TreeNodeAllowedList" in record:
                 if isinstance(record["TreeNodeAllowedList"]["TreeNodeAllowed"],list):
@@ -24,4 +30,5 @@ class Qualifier(MeshTerm,TermInTree):
                 else:
                     self.tree_nodes_allowed = [record["TreeNodeAllowedList"]["TreeNodeAllowed"]]
 
-            self.annotation = record["Annotation"] if "Annotation" in record else None
+            if "Annotation" in record:
+                self.annotation = record["Annotation"]

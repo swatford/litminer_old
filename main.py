@@ -11,11 +11,11 @@ def main(*args,**kwargs):
     # MESH_PATH = "/media/swatford/elements/medline/mesh"
     MESH_PATH = "F:\\medline\\mesh"
     from litminer.ming_models.model.mbr.qualifier import Qualifier
-
-    print(Qualifier.__mro__)
-    mi = MeshImporter(root=MESH_PATH,qualifier_fn="qual2015.xml.gz",
-                      descriptor_fn="desc2015.xml.gz",
-                      scr_fn="supp2015.xml.gz")
+    pass
+    # print(Qualifier.__mro__)
+    # mi = MeshImporter(root=MESH_PATH,qualifier_fn="qual2015.xml.gz",
+    #                   descriptor_fn="desc2015.xml.gz",
+    #                   scr_fn="supp2015.xml.gz")
     # mi = MeshImporter(root=MESH_PATH,scr_fn="supp2015.xml.gz")
 
     # FULL_XML_PATH = "/media/swatford/elements/medline/full_xml"

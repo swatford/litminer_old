@@ -1,10 +1,6 @@
 from ming import create_datastore
 from ming.odm import ThreadLocalODMSession
-import configparser
-from litminer import PROJECT_PATH
-
-config = configparser.ConfigParser()
-config.read("\\".join([PROJECT_PATH,"dev_config.ini"]))
+from litminer import config
 
 auth = dict(config["mongodb"])
 uri = auth.pop("uri",None)

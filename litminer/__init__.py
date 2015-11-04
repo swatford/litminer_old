@@ -1,3 +1,4 @@
-import os
+import configparser
 
-PROJECT_PATH = os.getcwd()
+config = configparser.ConfigParser()
+config.read("dev_config.ini")

@@ -1,7 +1,7 @@
 from litminer.utils import MeshImporter
+from litminer import config
 # from utils import ArticleImporter
 # from os import listdir
-import configparser
 import xmltodict as xtd
 from gzip import GzipFile
 from litminer.ming_models import session
@@ -9,16 +9,15 @@ from litminer.ming_models import session
 def main(*args,**kwargs):
 
     # MESH_PATH = "/media/swatford/elements/medline/mesh"
-    MESH_PATH = "F:\\medline\\mesh"
+    MESH_PATH = config["data"]["mesh"]
     from litminer.ming_models.model.mbr.qualifier import Qualifier
-    pass
-    # print(Qualifier.__mro__)
+
     # mi = MeshImporter(root=MESH_PATH,qualifier_fn="qual2015.xml.gz",
     #                   descriptor_fn="desc2015.xml.gz",
     #                   scr_fn="supp2015.xml.gz")
     # mi = MeshImporter(root=MESH_PATH,scr_fn="supp2015.xml.gz")
 
-    # FULL_XML_PATH = "/media/swatford/elements/medline/full_xml"
+    FULL_XML_PATH = config["data"]["medline_full"]
     # ai = ArticleImporter(FULL_XML_PATH)
 
     # def handle_article(_,article):

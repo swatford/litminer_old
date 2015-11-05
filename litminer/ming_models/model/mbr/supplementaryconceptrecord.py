@@ -1,8 +1,8 @@
-from litminer.ming_models.model.mbr import MeshTerm,TermPreviouslyIndexed
+from litminer.ming_models.model.mbr import (MeshTerm,TermPreviouslyIndexed,DatedDocument)
 from ming import schema
 from ming.odm import (FieldProperty)
 
-class SupplementaryConceptRecord(TermPreviouslyIndexed,MeshTerm):
+class SupplementaryConceptRecord(TermPreviouslyIndexed,DatedDocument,MeshTerm):
 
     frequency = FieldProperty(schema.Int)
     note = FieldProperty(schema.String)
